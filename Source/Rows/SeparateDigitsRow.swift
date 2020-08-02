@@ -45,17 +45,20 @@ open class SeparateDigitsCell: Cell<String>, CellType {
     @IBInspectable private var standardColor: UIColor = .gray
     @IBInspectable private var selectionColor: UIColor = .black
     @IBInspectable private var errorColor: UIColor = .red
+    @IBInspectable private var textFieldsFont: UIFont = .systemFont(ofSize: 17)
     
     // MARK: - Init
     
     required public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
+        changeState(to: .standard)
     }
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         selectionStyle = .none
+        changeState(to: .standard)
     }
     
     open override func setup() {
@@ -72,14 +75,14 @@ open class SeparateDigitsCell: Cell<String>, CellType {
 
 extension SeparateDigitsCell {
     
-    open func setUp(digitsCount: Int = 4, standardColor: UIColor = .gray, selectionColor: UIColor = .black, errorColor: UIColor = .red) {
+    open func setUp(digitsCount: Int = 4, standardColor: UIColor = .gray, selectionColor: UIColor = .black, errorColor: UIColor = .red, font: UIFont = .systemFont(ofSize: 17)) {
         self.digitsCount = digitsCount
         self.standardColor = standardColor
         self.selectionColor = selectionColor
         self.errorColor = errorColor
+        self.textFieldsFont = font
         
         setUpTextFields()
-        changeState(to: .standard)
     }
     
     open func changeState(to state: SeparateDigitsCellState) {
@@ -164,6 +167,7 @@ extension SeparateDigitsCell {
         textField.keyboardType = .numberPad
         textField.borderStyle = .none
         textField.adjustsFontSizeToFitWidth = false
+        textField.font = textFieldsFont
         
         return textField
     }
@@ -236,77 +240,9 @@ public final class SeparateDigitsRow: _SeparateDigitsRow, RowType {
         super.init(tag: tag)
     }
     
-    convenience init(digitsCount: Int, standardColor: UIColor, selectionColor: UIColor, errorColor: UIColor, completion: (SeparateDigitsRow) -> Void) {
+    convenience init(digitsCount: Int, standardColor: UIColor, selectionColor: UIColor, errorColor: UIColor, font: UIFont = .systemFont(ofSize: 17), completion: (SeparateDigitsRow) -> Void) {
         self.init(nil, completion)
-        cell.setUp(digitsCount: digitsCount, standardColor: standardColor, selectionColor: selectionColor, errorColor: errorColor)
-    }
-    
-}
-
-// MARK: - DigitTextFieldDelegate
-
-extension SeparateDigitsCell: DigitTextFieldDelegate {
-    
-    func digitTextField(_ textField: DigitTextField, changedCharactersIn range: NSRange, replacementString string: String) {
-        
-        if !string.isEmpty {
-            if textField != digitTextFields.last, let index = digitTextFields.firstIndex(of: textField) {
-                let field = digitTextFields[index + 1]
-                field.becomeFirstResponder()
-            } else if textField == digitTextFields.last {
-                textField.endEditing(true)
-            }
-        }
-        
-        textField.text = string
-
-        checkCodeIfNeeded()
-    }
-    
-    func backspaceActionInEmptyTextField(_ textField: DigitTextField) {
-        if textField != digitTextFields.first, let index = digitTextFields.firstIndex(of: textField) {
-            let field = digitTextFields[index - 1]
-            field.text = ""
-            field.becomeFirstResponder()
-        }
-    }
-    
-    func textFieldDidBeginEditing(_ textField: DigitTextField) {
-        changeState(to: .error)
-        if let index = digitTextFields.firstIndex(of: textField) {
-            textFieldBottomLines[index].backgroundColor = selectionColor
-        }
-    }
-    
-    func textFieldDidEndEditing(_ textField: DigitTextField) {
-        if let index = digitTextFields.firstIndex(of: textField) {
-            textFieldBottomLines[index].backgroundColor = standardColor
-        }
-    }
-    
-}
-
-// MARK: SeparateDigitsRow
-
-open class _SeparateDigitsRow: Row<SeparateDigitsCell> {
-
-    required public init(tag: String?) {
-        super.init(tag: tag)
-    }
-    
-}
-
-/** Use $0.cell.setUp(digitsCount: %d, standardColor: %@, errorColor: %@) in closure */
-
-public final class SeparateDigitsRow: _SeparateDigitsRow, RowType {
-
-    required public init(tag: String?) {
-        super.init(tag: tag)
-    }
-    
-    convenience init(digitsCount: Int, standardColor: UIColor, selectionColor: UIColor, errorColor: UIColor) {
-        self.init()
-        cell.setUp(digitsCount: digitsCount, standardColor: standardColor, selectionColor: selectionColor, errorColor: errorColor)
+        cell.setUp(digitsCount: digitsCount, standardColor: standardColor, selectionColor: selectionColor, errorColor: errorColor, font: font)
     }
     
 }
