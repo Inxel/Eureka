@@ -51,13 +51,11 @@ open class SeparateDigitsCell: Cell<String>, CellType {
     required public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         selectionStyle = .none
-        changeState(to: .standard)
     }
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         selectionStyle = .none
-        changeState(to: .standard)
     }
     
     open override func setup() {
@@ -81,6 +79,7 @@ extension SeparateDigitsCell {
         self.errorColor = errorColor
         
         setUpTextFields()
+        changeState(to: .standard)
     }
     
     open func changeState(to state: SeparateDigitsCellState) {
