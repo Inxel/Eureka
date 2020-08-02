@@ -281,7 +281,6 @@ extension SeparateDigitsCell: DigitTextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: DigitTextField) {
         if let index = digitTextFields.firstIndex(of: textField) {
-            #warning("Add colors")
             textFieldBottomLines[index].backgroundColor = standardColor
         }
     }
